@@ -1,0 +1,134 @@
+#leetcode 783
+#Runtime 101ms
+"""
+Definition of TreeNode:
+class TreeNode:
+    def __init__(self, val):
+        self.val = val
+        self.left, self.right = None, None
+"""
+
+class Solution:
+    """
+    @param root: the root
+    @return: the minimum difference between the values of any two different nodes in the tree
+    """
+    def minDiffInBST(self, root):
+        # Write your code here
+        ans = sys.maxsize
+        #find max in the left
+        if root.left:
+            lmax = root.left
+            while lmax.right: lmax = lmax.right
+            ans = min(ans, root.val - lmax.val)
+            ans = min(ans, self.minDiffInBST(root.left))
+        #find min in the right
+        if root.right:
+            rmin = root.right
+            while rmin.left: rmin = rmin.left
+            ans = min(ans, rmin.val - root.val)
+            ans = min(ans, self.minDiffInBST(root.right))
+        return ans
+        
+        
+        
+#leetcode 247   
+#Runtime 856ms
+class Solution:
+    """
+    @param n: the length of strobogrammatic number
+    @return: All strobogrammatic numbers
+    """
+    def findStrobogrammatic(self, n):
+        # write your code here
+        ans = self.helper(n, n)
+        return ans
+        
+    def helper(self,n, length):
+        if n==0:
+            return [""]
+        if n==1:
+            return ["1","0","8"]
+            
+        mids =  self.helper(n-2, length)
+        result = []
+        
+        for mid in mids:
+            if n!=length:
+                result.append("0" + mid + "0")
+            
+            result.append("8" + mid + "8")
+            result.append("6" + mid + "9")
+            result.append("9" + mid + "6")
+            result.append("1" + mid + "1")
+        
+        return result
+
+
+#leetcode 544
+#Runtime 50ms
+#Iteration Version
+class Solution:
+    """
+    @param n: a integer, denote the number of teams
+    @return: a string
+    """
+    def findContestMatch(self, n):
+        # write your code here
+        p = [""] * n
+        for i in  range(n):
+            p[i] = str(i+1)
+            
+        while (n>1):
+            for i in range(n//2):
+                p[i] = "(" + p[i] + "," + p[n-1-i] + ")"
+            n = n/2
+        return p[0]
+        
+#leetcode 698
+#Runtime 101ms
+#DFS version
+class Solution:
+    """
+    @param nums: a list of integer
+    @param k: an integer
+    @return: return a boolean, denote whether the array can be divided into k non-empty subsets whose sums are all equal
+    """
+    def partitiontoEqualSumSubsets(self, nums, k):
+        # write your code here
+        #sanity check
+        if not nums or len(nums)<k:
+            return False
+        
+        sum_ = sum(nums)
+        div, mod = divmod(sum_, k)
+        
+        if sum_%k or max(nums) > sum_/k:
+            return False
+        nums.sort(reverse = True)
+        target = [div]*k
+        
+        return self.dfs(nums, k, 0, target)
+        
+    def dfs(self, nums, k, index, target):
+        if index == len(nums):
+            return True
+        cur = nums[index]
+        #start fill
+        for i in range(k):
+            if target[i]>= cur:
+                target[i] -= cur
+                if self.dfs(nums, k, index+1, target):
+                    return True
+                #backtrack
+                target[i] += cur
+        
+        return False
+            
+
+
+
+            
+        
+
+        
