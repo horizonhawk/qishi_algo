@@ -1,0 +1,198 @@
+#Leetcode 69 Sqrt(x)
+#Total runtime 101 ms
+class Solution:
+    """
+    @param x: An integer
+    @return: The sqrt of x
+    """
+    def sqrt(self, x):
+        # write your code here
+        if x<0:
+            return None
+        
+        start, end = 0, x
+        
+        while start+1<end:
+            mid = (start+end)//2
+            
+            if mid*mid<=x:
+                start = mid
+            else: 
+                end = mid
+                
+        if end*end<=x:
+            return end
+        
+        return start
+        
+#Leetcode 852 Peak Index in a Mountain Array
+#Total runtime 1963 ms
+class Solution:
+    """
+    @param A: An integers array.
+    @return: return any of peek positions.
+    """
+    def findPeak(self, A):
+        # write your code here
+        #this is to return any peak index, not all of them
+        #i>0, start from 1, not 0! end start from len(A)-2, not len(A)-1
+        start, end = 1, len(A)-2
+        while start+1<end:
+            mid = (start+end)//2
+            if A[mid]<A[mid-1]:
+                end = mid
+            elif A[mid]<A[mid+1]:
+                start = mid
+            else:
+                end = mid
+        
+        if A[start]<A[end]:
+            return end
+        else:
+            return start 
+           
+#Leetcode 74 Search a 2D Matrix
+#Total runtime 101 ms
+class Solution:
+    """
+    @param matrix: matrix, a list of lists of integers
+    @param target: An integer
+    @return: a boolean, indicate whether matrix contains target
+    """
+    def searchMatrix(self, matrix, target):
+        # write your code here
+        if len(matrix) == 0:
+            return False
+            
+        n = len(matrix)
+        m = len(matrix[0])
+        
+        start, end = 0, n*m-1
+        
+        while start+1<end:
+            mid = (start+end)//2
+            new_x, new_y = mid//m, mid%m
+            
+            if matrix[new_x][new_y] < target:
+                start = mid
+            else:
+                end = mid
+        #check start and end    
+        new_x, new_y = start//m,start%m
+        if matrix[new_x][new_y] == target:
+            return True
+        
+        new_x, new_y = end//m, end%m
+        if matrix[new_x][new_y] == target:
+            return True
+        
+        return False
+        
+#Leetcode 34 Find First and Last Position of Element in Sorted Array
+class Solution:
+    def searchRange(self, nums: List[int], target: int) -> List[int]:
+        left = self.left_bound(nums, target)
+        right = self.right_bound(nums, target)
+        if left == right:
+            return [-1, -1]
+        return [left, right - 1]
+    
+    def left_bound(self, nums, target):
+        # find in range [left, right)
+        left, right = 0, len(nums)
+        while left < right:
+            mid = left + (right - left) // 2
+            if nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid
+        return left
+    
+    def right_bound(self, nums, target):
+        # find in range [left, right)
+        left, right = 0, len(nums)
+        while left < right:
+            mid = left + (right - left) // 2
+            if nums[mid] <= target:
+                left = mid + 1
+            else:
+                right = mid
+        return left
+        
+#Leetcode 302, Lintcode 600 Smallest Rectangle Enclosing Black Pixels
+#Total runtime 1510 ms
+class Solution:
+    """
+    @param image: a binary matrix with '0' and '1'
+    @param x: the location of one of the black pixels
+    @param y: the location of one of the black pixels
+    @return: an integer
+    """
+    def minArea(self, image, x, y):
+        # write your code here
+        # Write your code here
+        m, n = len(image), len(image[0])
+        if m*n == 0:
+            return 0
+
+        start = y
+        end = n - 1
+        while start < end:
+            mid = start + (end - start) // 2 + 1
+            if self.checkColumn(image, mid):
+                start = mid
+            else:
+                end = mid - 1
+
+        right = start
+
+        start = 0
+        end = y
+        while start < end:
+            mid = start + (end - start) // 2
+            if self.checkColumn(image, mid):
+                end = mid
+            else:
+                start = mid + 1
+
+        left = start
+        
+        start = x
+        end = m - 1
+        while start < end:
+            mid = start + (end - start) // 2 + 1
+            if self.checkRow(image, mid):
+                start = mid
+            else:
+                end = mid - 1
+
+        down = start
+        
+        start = 0
+        end = x
+        while start < end:
+            mid = start + (end - start) // 2
+            if self.checkRow(image, mid):
+                end = mid
+            else:
+                start = mid + 1
+
+        up = start
+        
+        return (right - left + 1) * (down - up + 1)
+    
+    ##Those are chars, not integers!!!
+    def checkColumn(self, image, col):
+        for i in range(len(image)):
+            if image[i][col] == '1':
+                return True
+        return False
+
+    def checkRow(self, image, row):
+        for j in range(len(image[0])):
+            if image[row][j] == '1':
+                return True
+        return False
+
+
+
