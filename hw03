@@ -1,0 +1,218 @@
+#376 Binary Tree Path Sum
+"""
+Definition of TreeNode:
+class TreeNode:
+    def __init__(self, val):
+        self.val = val
+        self.left, self.right = None, None
+"""
+
+##This is to return all possible paths! DFS
+class Solution:
+    """
+    @param: root: the root of binary tree
+    @param: target: An integer
+    @return: all valid paths
+    """
+    def binaryTreePathSum(self, root, target):
+        # write your code here
+        result = []
+        cur = []
+        self.dfs(root, target, result, cur, 0)
+        return result
+        
+    def dfs(self,root,target,result,cur,sum_):
+        if root is None:
+            return
+        
+        cur.append(root.val)
+        sum_ += root.val
+        
+        #root to leaf path!
+        if root.right is None and root.left is None and sum_ == target:
+            result.append(cur[:])
+        
+        self.dfs(root.right,target,result,cur,sum_)
+        self.dfs(root.left,target,result,cur,sum_)
+        
+        cur.pop()
+
+#164.Unique Binary Search Trees II
+"""
+Definition of TreeNode:
+class TreeNode:
+    def __init__(self, val):
+        self.val = val
+        self.left, self.right = None, None
+"""
+
+#generate all possible solutions --> DFS
+#this is hard
+class Solution:
+    # @paramn n: An integer
+    # @return: A list of root
+    def generateTrees(self, n):
+        # write your code here
+
+        return self.dfs(1,n)
+        
+    def dfs(self,start,end):
+        #return [None], not None!
+        if start > end:
+            return [None]
+            
+        result = []
+        #is has to be end+1 to cover end
+        for rootval in range(start,end+1):
+            left = self.dfs(start, rootval-1)
+            right = self.dfs(rootval+1, end)
+            #construct the tree now
+            for i in left:
+                for j in right:
+                    root = TreeNode(rootval)
+                    root.left = i
+                    root.right = j
+                    result.append(root)
+                    
+        return result
+        
+ #433.Number of Islands
+ #using deque for storing current queue
+from collections import deque
+
+class Solution:
+    """
+    @param grid: a boolean 2D matrix
+    @return: an integer
+    """
+    #Typical BFS
+    def numIslands(self, grid):
+        # write your code here
+        if not grid or not grid[0]:
+            return 0
+            
+        islands = 0
+        visited = set()
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] and (i, j) not in visited:
+                    self.bfs(grid, i, j, visited)
+                    islands += 1
+                    
+        return islands
+        
+        
+    def bfs(self,grid,x,y,visited):
+        queue = deque([(x, y)])
+        visited.add((x, y))
+        #now comes with the template for BFS
+        while queue:
+            x,y = queue.popleft()
+            for delta_x, delta_y in [(1, 0), (0, -1), (-1, 0), (0, 1)]:
+                new_x = x + delta_x
+                new_y = y + delta_y
+                if not self.is_valid(grid, new_x, new_y, visited):
+                    continue
+                queue.append((new_x, new_y))
+                visited.add((new_x, new_y))
+
+    #check if the (x,y) is in the grid, if visited, if an island            
+    def is_valid(self, grid, x, y, visited):
+        n, m = len(grid), len(grid[0])
+        return 0 <= x < n and 0 <= y < m and (x, y) not in visited and grid[x][y]
+
+#70.Binary Tree Level Order Traversal II
+"""
+Definition of TreeNode:
+class TreeNode:
+    def __init__(self, val):
+        self.val = val
+        self.left, self.right = None, None
+"""
+#first do the common traversal, then reverse the results
+class Solution:
+    """
+    @param root: A tree
+    @return: buttom-up level order a list of lists of integer
+    """
+    def levelOrderBottom(self, root):
+        # write your code here
+        self.results = []
+        if not root:
+            return self.results
+        q = [root]
+        while q:
+            new_q = []
+            self.results.append([n.val for n in q])
+            for node in q:
+                if node.left:
+                    new_q.append(node.left)
+                if node.right:
+                    new_q.append(node.right)
+            q = new_q
+        return list(reversed(self.results))
+
+#7. Serialize and Deserialize Binary Tree
+"""
+Definition of TreeNode:
+class TreeNode:
+    def __init__(self, val):
+        self.val = val
+        self.left, self.right = None, None
+"""
+
+
+class Solution:
+    """
+    @param root: An object of TreeNode, denote the root of the binary tree.
+    This method will be invoked first, you should design your own algorithm 
+    to serialize a binary tree which denote by a root node to a string which
+    can be easily deserialized by your own "deserialize" method later.
+    """
+    #BFS 
+    def serialize(self, root):
+        # write your code here
+        if not root:
+            return ['#']
+        q = [root]
+        ans = []
+        while q:
+            temp = q.pop(0)
+            if not temp:
+                ans.append('#')
+            else:
+                ans.append(str(temp.val))
+                q.append(temp.left)
+                q.append(temp.right)
+        return ans
+                
+
+    """
+    @param data: A string serialized by your serialize method.
+    This method will be invoked second, the argument data is what exactly
+    you serialized at method "serialize", that means the data is not given by
+    system, it's given by your own serialize method. So the format of data is
+    designed by yourself, and deserialize it here as you serialize it in 
+    "serialize" method.
+    """
+    def deserialize(self, data):
+        # write your code here
+        if data[0] == '#':
+            return None
+        root = TreeNode(int(data.pop(0)))
+        q = [root]
+        isLeft = True
+        while data:
+            ch = data.pop(0)
+            if ch != '#':
+                node = TreeNode(int(ch))
+                q.append(node)
+                if isLeft:
+                    q[0].left = node
+                else:
+                    q[0].right = node
+            if not isLeft:
+                q.pop(0)
+            isLeft = not isLeft
+        return root
+
